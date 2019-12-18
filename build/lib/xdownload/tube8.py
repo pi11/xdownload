@@ -27,7 +27,7 @@ def get_video_info(ses, url):
 def get_recent_videos(ses, pages=[2, ]):
     """ Function return dict with url, title and url for video download
 
-    Input: username and password for tube8.com,
+    Input: requests session,
     list of pages to parse"""
     
     result = []

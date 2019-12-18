@@ -37,7 +37,7 @@ def get_recent_videos(ses, pages=[2, ], rus=False):
         parsed = pq(data)
         for el in parsed.items('li.videoBox a:first'):
             url = el.attr('href')
-            if "view_video" in href:
+            if "view_video" in url:
                 result.append("%s%s" % (domain, url))
         time.sleep(10) # some user behavior emulation
     return result
