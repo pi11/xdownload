@@ -16,3 +16,5 @@ app/local_settings.py
 *.bak
 local_settings.py
 __pycache__
+build/
+dist/

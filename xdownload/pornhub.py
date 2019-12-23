@@ -18,6 +18,30 @@ def get_video_info(ses, url):
     categories = [c.text() for c in parsed('.categoriesWrapper a').items()]
     tags = [c.text() for c in parsed('.tagsWrapper a').items()]
     return {"page":url, "title":title, "categories":categories, "tags":tags}
+
+def parse_pornhub_url(ses, url, domain):
+    result = []
+    data = ses.get('%s%s' % (ru_url, p)).text
+    parsed = pq(data)
+    for el in parsed.items('li.videoBox a:first'):
+        url = el.attr('href')
+        if "view_video" in url:
+            result.append("%s%s" % (domain, url))
+    return result
+
+def search_videos(ses, query, pages=[2, ], rus=False):
+    if rus:
+        domain = "https://rt.pornhub.com"
+        url = "https://rt.pornhub.com/video/search?search=%s&p=homemade&page=" % query
+    else:
+        url = "https://www.pornhub.com/video/search?search=%s&p=homemade&page=" % query
+        domain = "https://www.pornhub.com"
+    result = []
+    for p in pages:
+        result.append(parse_pornhub_url(ses, url, domain))
+        time.sleep(10) # some user behavior emulation
+    return result
+    
     
 def get_recent_videos(ses, pages=[2, ], rus=False):
     """ Function return dict with url, title and url for video download
@@ -26,19 +50,16 @@ def get_recent_videos(ses, pages=[2, ], rus=False):
     list of pages to parse"""
     
     result = []
+    if rus:
+        domain = "https://rt.pornhub.com"
+        b_url = "https://rt.pornhub.com/video?p=homemade&o=mv&t=a&cc=us&hd=1&page="
+    else:
+        domain = "https://www.pornhub.com"
+        b_url = "https://www.pornhub.com/video?p=homemade&o=mv&cc=us&page="
+                      
     for p in pages:
-        if rus:
-            domain = "https://rt.pornhub.com"
-            url = "https://rt.pornhub.com/video?p=homemade&o=mv&t=a&cc=us&hd=1&page="
-        else:
-            domain = "https://www.pornhub.com"
-            url = "https://www.pornhub.com/video?o=mv&cc=us&page="
-        data = ses.get('%s%s' % (url, p)).text
-        parsed = pq(data)
-        for el in parsed.items('li.videoBox a:first'):
-            url = el.attr('href')
-            if "view_video" in url:
-                result.append("%s%s" % (domain, url))
+        url = b_url + str(b)
+        result.append(parse_pornhub_url(ses, url, domain)
         time.sleep(10) # some user behavior emulation
     return result
 
