@@ -19,7 +19,7 @@ def get_video_info(ses, url):
     tags = [c.text() for c in parsed('.tagsWrapper a').items()]
     return {"page":url, "title":title, "categories":categories, "tags":tags}
 
-def parse_pornhub_url(ses, url, domain):
+def parse_pornhub_url(ses, url, domain, DEBUG=False):
     result = []
     data = ses.get(url).text
     parsed = pq(data)
