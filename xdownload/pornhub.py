@@ -3,8 +3,6 @@ import time
 import requests
 from pyquery import PyQuery as pq
 
-DEBUG = False
-
 def login():
     login_url = ""
     headers = {
@@ -33,7 +31,7 @@ def parse_pornhub_url(ses, url, domain):
             result.append("%s%s" % (domain, url))
     return result
 
-def search_videos(ses, query, pages=[2, ], rus=False):
+def search_videos(ses, query, pages=[2, ], rus=False, DEBUG=False):
     if rus:
         domain = "https://rt.pornhub.com"
         b_url = "https://rt.pornhub.com/video/search?search=%s&p=homemade&page=" % query
@@ -52,7 +50,7 @@ def search_videos(ses, query, pages=[2, ], rus=False):
     return result
     
     
-def get_recent_videos(ses, pages=[2, ], rus=False):
+def get_recent_videos(ses, pages=[2, ], rus=False, DEBUG=False):
     """ Function return dict with url, title and url for video download
 
     Input: requests session,
@@ -78,14 +76,13 @@ def get_recent_videos(ses, pages=[2, ], rus=False):
 
 if __name__ == "__main__":
     ses = login()
-    DEBUG = True
     # example usage:
-    for v in search_videos(ses, 'blowjob')[:5]:
+    for v in search_videos(ses, 'blowjob', DEBUG=True)[:5]:
         print("Video:", v)
         print (get_video_info(ses, v))
         time.sleep(5)
 
-    for v in get_recent_videos(ses)[:5]:
+    for v in get_recent_videos(ses, DEBUG=True)[:5]:
         print("Video:", v)
         print (get_video_info(ses, v))
         time.sleep(5)
