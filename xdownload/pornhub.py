@@ -2,6 +2,7 @@ import re
 import time
 import requests
 from pyquery import PyQuery as pq
+from urllib.parse import quote
 
 def login():
     login_url = ""
@@ -34,9 +35,9 @@ def parse_pornhub_url(ses, url, domain, DEBUG=False):
 def search_videos(ses, query, pages=[2, ], rus=False, DEBUG=False):
     if rus:
         domain = "https://rt.pornhub.com"
-        b_url = "https://rt.pornhub.com/video/search?search=%s&p=homemade&page=" % query
+        b_url = "https://rt.pornhub.com/video/search?search=%s&p=homemade&page=" % quote(query)
     else:
-        b_url = "https://www.pornhub.com/video/search?search=%s&p=homemade&page=" % query
+        b_url = "https://www.pornhub.com/video/search?search=%s&p=homemade&page=" % quote(query)
         domain = "https://www.pornhub.com"
     result = []
     for p in pages:
@@ -77,7 +78,7 @@ def get_recent_videos(ses, pages=[2, ], rus=False, DEBUG=False):
 if __name__ == "__main__":
     ses = login()
     # example usage:
-    for v in search_videos(ses, 'blowjob', DEBUG=True)[:5]:
+    for v in search_videos(ses, 'blowjob and anal', DEBUG=True)[:5]:
         print("Video:", v)
         print (get_video_info(ses, v))
         time.sleep(5)
