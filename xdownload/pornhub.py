@@ -3,6 +3,8 @@ import time
 import requests
 from pyquery import PyQuery as pq
 
+DEBUG = False
+
 def login():
     login_url = ""
     headers = {
@@ -21,24 +23,31 @@ def get_video_info(ses, url):
 
 def parse_pornhub_url(ses, url, domain):
     result = []
-    data = ses.get('%s%s' % (ru_url, p)).text
+    data = ses.get(url).text
     parsed = pq(data)
     for el in parsed.items('li.videoBox a:first'):
         url = el.attr('href')
         if "view_video" in url:
+            if DEBUG:
+                print('New video url found: %s' % url)
             result.append("%s%s" % (domain, url))
     return result
 
 def search_videos(ses, query, pages=[2, ], rus=False):
     if rus:
         domain = "https://rt.pornhub.com"
-        url = "https://rt.pornhub.com/video/search?search=%s&p=homemade&page=" % query
+        b_url = "https://rt.pornhub.com/video/search?search=%s&p=homemade&page=" % query
     else:
-        url = "https://www.pornhub.com/video/search?search=%s&p=homemade&page=" % query
+        b_url = "https://www.pornhub.com/video/search?search=%s&p=homemade&page=" % query
         domain = "https://www.pornhub.com"
     result = []
     for p in pages:
-        result.append(parse_pornhub_url(ses, url, domain))
+        url = b_url + str(p)
+        if DEBUG:
+            print('Loading: %s' % url)
+        new = parse_pornhub_url(ses, url, domain)
+        if new:
+            result += new
         time.sleep(10) # some user behavior emulation
     return result
     
@@ -58,13 +67,25 @@ def get_recent_videos(ses, pages=[2, ], rus=False):
         b_url = "https://www.pornhub.com/video?p=homemade&o=mv&cc=us&page="
                       
     for p in pages:
-        url = b_url + str(b)
-        result.append(parse_pornhub_url(ses, url, domain)
+        url = b_url + str(p)
+        if DEBUG:
+            print('Loading: %s' % url)
+        new = parse_pornhub_url(ses, url, domain)
+        if new:
+            result += new
         time.sleep(10) # some user behavior emulation
     return result
 
 if __name__ == "__main__":
     ses = login()
-    for v in get_recent_videos(ses):
-        #print(v)
+    DEBUG = True
+    # example usage:
+    for v in search_videos(ses, 'blowjob')[:5]:
+        print("Video:", v)
         print (get_video_info(ses, v))
+        time.sleep(5)
+
+    for v in get_recent_videos(ses)[:5]:
+        print("Video:", v)
+        print (get_video_info(ses, v))
+        time.sleep(5)
