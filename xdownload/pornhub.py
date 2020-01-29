@@ -17,8 +17,10 @@ def get_video_info(ses, url):
     parsed = pq(data)
     title = parsed('h1.title:first').text()
     categories = [c.text() for c in parsed('.categoriesWrapper a').items()]
+    pornstars = [c.text() for c in parsed('.pornstarsWrapper a.pstar-list-btn').items()]
     tags = [c.text() for c in parsed('.tagsWrapper a').items()]
-    return {"page":url, "title":title, "categories":categories, "tags":tags}
+    return {"page":url, "title":title, "categories":categories, "tags":tags,
+            "pornstars":pornstars}
 
 def parse_pornhub_url(ses, url, domain, DEBUG=False):
     result = []
