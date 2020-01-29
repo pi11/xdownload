@@ -1,7 +1,7 @@
 Metadata-Version: 1.0
 Name: xdownload
-Version: 0.0.4
-Summary: Video downloader for various web sites
+Version: 0.0.5
+Summary: Video downloader/meta tag extractor for various web sites
 Home-page: https://bitbucket.org/pi11/xdownload
 Author: pi11
 Author-email: webii@yandex.ru
