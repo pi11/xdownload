@@ -1,6 +1,7 @@
 import re
 import time
 import requests
+from requests.exceptions import ConnectionError
 from pyquery import PyQuery as pq
 from urllib.parse import quote
 
@@ -12,7 +13,17 @@ def login():
     ses = requests.Session()
     return ses
 
-def get_video_info(ses, url):
+def get_video_info(ses, url, tries=3, timeout=5):
+    retries = 1
+    data = False
+    while not data and retries <= tries:
+        try:
+            data = ses.get(url).text
+        except ConnectionError:
+            retries += 1
+            print("Connection error, sleeping for %s seconds" % (timeout * retries))
+            time.sleep(timeout * retries)
+
     data = ses.get(url).text
     parsed = pq(data)
     title = parsed('h1.title:first').text()
@@ -22,9 +33,18 @@ def get_video_info(ses, url):
     return {"page":url, "title":title, "categories":categories, "tags":tags,
             "pornstars":pornstars}
 
-def parse_pornhub_url(ses, url, domain, DEBUG=False):
+def parse_pornhub_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
     result = []
-    data = ses.get(url).text
+    retries = 1
+    data = False
+    while not data and retries <= tries:
+        try:
+            data = ses.get(url).text
+        except ConnectionError:
+            retries += 1
+            print("Connection error, sleeping for %s seconds" % (timeout * retries))
+            time.sleep(timeout * retries)
+        
     parsed = pq(data)
     for el in parsed.items('li.videoBox a:first'):
         url = el.attr('href')
