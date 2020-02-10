@@ -1,94 +1,92 @@
-import sys
 import re
+import time
 import requests
+from requests.exceptions import ConnectionError
 from pyquery import PyQuery as pq
+from urllib.parse import quote
 
-headers = {"ACCEPT":"text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-           "ACCEPT_ENCODING":"gzip, deflate, br",
-           "ACCEPT-LANGUAGE":"en-US,en;q=0.5",
-           "CONNECTION":"keep-alive",
-           "DNT":"1",
-           "HOST":"24video.sexy",
-           "REFERER":"https://24video.sexy/",
-           ##"UPGRADE-INSECURE-REQUESTS":"0",
-           "USER-AGENT":"Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101 Firefox/60.0",
-           "X-REAL-IP":"163.172.59.10",
-           "X-FORWARDED-FOR":"163.172.59.10",
-           "X-ACCEL-INTERNAL":""}
+_DOMAIN = "https://www.24video.vip"
 
 def login():
+    login_url = ""
+    headers = {
+        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
+        }    
     ses = requests.Session()
-    ses.headers.update(headers)
     return ses
 
-def get_video_info(ses, url):
-    print ("Parsing: %s" % url)
+def get_video_info(ses, url, tries=3, timeout=5):
+    retries = 1
+    data = False
+    while not data and retries <= tries:
+        try:
+            data = ses.get(url).text
+        except ConnectionError:
+            retries += 1
+            print("Connection error, sleeping for %s seconds" % (timeout * retries))
+            time.sleep(timeout * retries)
+
     data = ses.get(url).text
     parsed = pq(data)
-    mp4_url = parsed('#videoContainer video:first').attr('src')
-    poster = parsed('#videoContainer video:first').attr('poster')
-    title = parsed('h1#mTitle').text()
-    return {"page":url, "mp4":mp4_url, "title":title, "poster":poster}
+    title = parsed('h1.video-title:first').text()
+    tags = [c.text() for c in parsed('p.video-info-tags a').items()]
+    desc = parsed('p.desc').text()
+    return {"page":url, "title":title, "tags":tags, "description":desc}
+
+def parse_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
+    result = []
+    retries = 1
+    data = False
+    while not data and retries <= tries:
+        try:
+            data = ses.get(url).text
+        except ConnectionError:
+            retries += 1
+            print("Connection error, sleeping for %s seconds" % (timeout * retries))
+            time.sleep(timeout * retries)
+        
+    parsed = pq(data)
+    for el in parsed.items('.list a.list-item'):
+        url = el.attr('href')
+        print(url)
+        if "video/view" in url:
+            if DEBUG:
+                print('New video url found: %s' % url)
+            result.append("%s%s" % (domain, url))
+    return result
+
     
-def get_recent_videos(ses, pages=[2, ]):
-    """ Function return dict with url, title, description
-    and url for video download
+def get_recent_videos(ses, pages=[1, ], rus=False, DEBUG=False):
+    """ Function return dict with url, title and url for video download
 
     Input: requests session,
     list of pages to parse"""
     
     result = []
+    domain = _DOMAIN 
+    b_url = "%s/video/filter?sort=3&time=0&page=" % domain
+                      
     for p in pages:
-        url = 'https://www.24video.sexy' #'video/filter'
-        querystring = {"page":p, "sort":3, "time":0}
-        print("Loading: %s" % url)
-        try:
-            ses.max_redirects = 10
-            response = ses.get(url, headers=headers, )#.text#, params=querystring).text
-        except requests.exceptions.TooManyRedirects as exc:
-            if exc.response.history:
-                for resp in exc.response.history:
-                    print(resp.status_code, resp.url)
-                print(exc.response.status_code, exc.response.url)
-            else:
-                print("Request was not redirected")
-            
-            print(exc)
-            print(exc.response)
-            print(exc.response.url)
-            from pprint import pprint
-            pprint(vars(exc))
-            sys.exit()
-        print(data)
-        parsed = pq(data)
-        for el in parsed.items('a.list-item'):
-            url = el.attr('href')
-            if "http" in url:
-                result.append(url)
+        url = b_url + str(p)
+        if DEBUG:
+            print('Loading: %s' % url)
+        new = parse_url(ses, url, domain)
+        if new:
+            result += new
+        time.sleep(10) # some user behavior emulation
     return result
-
-
-
-"""
-def download_24video(url):
-
-
-    s = requests.session()
-    p = s.get(url, headers=headers)
-    parse_page = pq(p.content)
-    download_url = parse_page('video').attr('src')
-
-    #print("Downloading, please wait...")
-    res = s.get(download_url, headers=headers)
-    #print(res.headers)
-    #print("Len:", len(res.content))
-
-    with open('t.mp4', 'wb+') as f:
-        f.write(res.content)
-"""
 
 if __name__ == "__main__":
     ses = login()
-    for v in get_recent_videos(ses):
-        print (v)
-        #print (get_video_info(ses, v))
+    #v = get_video_info(ses, 'https://www.24video.vip/video/view/2706767')
+    #print(v)
+    # example usage:
+    #for v in search_videos(ses, 'blowjob and anal', DEBUG=True)[:5]:
+    #    print("Video:", v)
+    #    print (get_video_info(ses, v))
+    #    time.sleep(5)
+
+    for v in get_recent_videos(ses, DEBUG=True)[:5]:
+        print("Video:", v)
+        print (get_video_info(ses, v))
+        time.sleep(5)
