@@ -12,7 +12,8 @@ def login(proxies={}):
     headers = {
         'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
         }    
-    ses = requests.Session(proxies=proxies)
+    ses = requests.Session()
+    ses.proxies=proxies
     return ses
 
 def get_video_info(ses, url, tries=3, timeout=5):
