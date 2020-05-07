@@ -32,7 +32,11 @@ def get_video_info(ses, url, tries=3, timeout=5):
     title = parsed('h1.video-title:first').text()
     tags = [c.text() for c in parsed('p.video-info-tags a').items()]
     desc = parsed('p.desc').text()
-    return {"page":url, "title":title, "tags":tags, "description":desc}
+    mp4 = parsed('video:first').attr('src')
+    poster = parsed('video:first').attr('poster')
+    
+    return {"page":url, "title":title, "tags":tags, "description":desc, "mp4":mp4,
+            "poster":poster}
 
 def parse_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
     result = []
