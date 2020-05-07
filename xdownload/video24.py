@@ -32,10 +32,13 @@ def get_video_info(ses, url, tries=3, timeout=5):
     title = parsed('h1.video-title:first').text()
     tags = [c.text() for c in parsed('p.video-info-tags a').items()]
     desc = parsed('p.desc').text()
-    mp4 = parsed('video:first').attr('src')
+    embed_url = parsed('meta[property="og:video"]').attr('content')
+    data_embed = ses.get(embed_url)
+    p2 = pq(data_embed)
+    mp4 = p2('video:first').attr('src')
     if not mp4:
         print('No video found!')
-        print(data)
+        print(data_embed)
     poster = parsed('video:first').attr('poster')
     
     return {"page":url, "title":title, "tags":tags, "description":desc, "mp4":mp4,
