@@ -33,7 +33,8 @@ def get_video_info(ses, url, tries=3, timeout=5):
     tags = [c.text() for c in parsed('p.video-info-tags a').items()]
     desc = parsed('p.desc').text()
     embed_url = parsed('meta[property="og:video"]').attr('content')
-    data_embed = ses.get(embed_url)
+    print('Downloading embed url: %s' % embed_url)
+    data_embed = ses.get(embed_url).text
     p2 = pq(data_embed)
     mp4 = p2('video:first').attr('src')
     if not mp4:
