@@ -33,6 +33,9 @@ def get_video_info(ses, url, tries=3, timeout=5):
     tags = [c.text() for c in parsed('p.video-info-tags a').items()]
     desc = parsed('p.desc').text()
     mp4 = parsed('video:first').attr('src')
+    if not mp4:
+        print('No video found!')
+        print(data)
     poster = parsed('video:first').attr('poster')
     
     return {"page":url, "title":title, "tags":tags, "description":desc, "mp4":mp4,
