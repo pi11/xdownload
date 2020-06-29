@@ -103,11 +103,12 @@ def get_hot_videos(ses, pages=[2, ], hm=True, country=False, DEBUG=False):
     
     result = []
     domain = "https://www.pornhub.com"
-    b_url = "%s/video?o=ht" # top videos
+    b_url = "%s/video?o=ht" % domain # top videos
     if hm:
         b_url = "%s&p=homemade" % b_url
     if country:
         b_url = "%s&cc=%s" % (b_url, country)
+    b_url = "%s&page=" % b_url
     for p in pages:
         url = b_url + str(p)
         if DEBUG:
