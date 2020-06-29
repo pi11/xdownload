@@ -97,6 +97,28 @@ def get_recent_videos(ses, pages=[2, ], rus=False, DEBUG=False):
         time.sleep(10) # some user behavior emulation
     return result
 
+def get_hot_videos(ses, pages=[2, ], hm=True, country=False, DEBUG=False):
+    """ Function return dict with url, title and url for video download
+    """
+    
+    result = []
+    domain = "https://www.pornhub.com"
+    b_url = "%s/video?o=ht" # top videos
+    if hm:
+        b_url = "%s&p=homemade" % b_url
+    if country:
+        b_url = "%s&cc=%s" % (b_url, country)
+    for p in pages:
+        url = b_url + str(p)
+        if DEBUG:
+            print('Loading: %s' % url)
+        new = parse_pornhub_url(ses, url, domain)
+        if new:
+            result += new
+        time.sleep(10) # some user behavior emulation
+    return result
+
+
 if __name__ == "__main__":
     ses = login()
     # example usage:
