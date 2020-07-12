@@ -82,10 +82,10 @@ def get_recent_videos(ses, pages=[2, ], rus=False, DEBUG=False):
     result = []
     if rus:
         domain = "https://rt.pornhub.com"
-        b_url = "https://rt.pornhub.com/video?p=homemade&o=mv&t=a&cc=us&hd=1&page="
+        b_url = "https://rt.pornhub.com/video?p=homemade&o=mv&t=a&cc=ru&hd=1&page="
     else:
         domain = "https://www.pornhub.com"
-        b_url = "https://www.pornhub.com/video?p=homemade&o=mv&cc=us&page="
+        b_url = "https://www.pornhub.com/video?p=homemade&o=mv&cc=ru&page="
                       
     for p in pages:
         url = b_url + str(p)
