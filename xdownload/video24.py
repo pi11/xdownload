@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError
 from pyquery import PyQuery as pq
 from urllib.parse import quote
 
-_DOMAIN = "https://www.24video.vip"
+_DOMAIN = "https://vip.24video.click/"
 
 def login(proxies={}):
     login_url = ""
