@@ -56,14 +56,19 @@ def parse_pornhub_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
 
 def search_videos(ses, query, pages=[2, ], rus=False, recent=False,
                   DEBUG=False):
-    if rus:
-        domain = "https://rt.pornhub.com"
-        b_url = "https://rt.pornhub.com/video/search?search=%s&p=homemade&page=" % quote(query)
-    else:
-        b_url = "https://www.pornhub.com/video/search?search=%s&p=homemade&page=" % quote(query)
-        domain = "https://www.pornhub.com"
     if recent:
-        b_url = "%s&o=mr" % b_url
+        recent_query = "&o=mr"
+    else:
+        recent_query = ""
+
+    if rus:
+        www_domain = "rt"
+    else:
+        www_domain = "www"
+        
+    domain = "https://%s.pornhub.com" % www_domain
+    b_url = ("https://%s.pornhub.com/video/search?search="
+             "%s%s&p=homemade&page=") % (www_domain, quote(query), recent_query)
     result = []
     for p in pages:
         url = b_url + str(p)
