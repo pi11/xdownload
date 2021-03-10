@@ -3,8 +3,7 @@ import time
 import requests
 from requests.exceptions import ConnectionError
 from pyquery import PyQuery as pq
-from urllib.parse import quote
-import urlparse
+from urllib.parse import quote, urljoin
 
 _DOMAIN = "https://vip.24video.click/"
 
@@ -65,7 +64,7 @@ def parse_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
         if "video/view" in url:
             if DEBUG:
                 print('New video url found: %s' % url)
-            r_url = urlparse.urljoin(domain, url)
+            r_url = urljoin(domain, url)
             result.append(r_url)
     return result
 
