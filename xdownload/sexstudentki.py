@@ -32,7 +32,7 @@ def get_video_info(ses, url, tries=3, timeout=5):
     data = ses.get(url).text
     parsed = pq(data)
     parsed.make_links_absolute(_DOMAIN)
-    title = parsed("video-header h1:first").text()
+    title = parsed(".video-header h1:first").text()
     tags = [c.text() for c in parsed(".tags-alt a").items()]
     desc = ""  # parsed("p.desc").text()
     # embed_url = parsed('meta[property="og:video"]').attr("content")
@@ -40,7 +40,7 @@ def get_video_info(ses, url, tries=3, timeout=5):
     if not mp4:
         print("No video found!")
         print(data)
-        sys.exit()
+        # sys.exit()
     poster = urljoin(_DOMAIN, parsed("video:first").attr("poster"))
 
     return {
@@ -68,7 +68,7 @@ def parse_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
     parsed = pq(data)
     for el in parsed.items(".videos-page .video a"):
         url = el.attr("href")
-        print("Url:", url)
+        # print("Url:", url)
         if "/video/" in url:
             if DEBUG:
                 print("New video url found: %s" % url)
