@@ -1,11 +1,14 @@
 setup.py
 xdownload/__init__.py
 xdownload/pornhub.py
+xdownload/sexstudentki.py
 xdownload/sunporno.py
 xdownload/tube8.py
 xdownload/tumblr.py
 xdownload/updatetube.py
 xdownload/video24.py
+xdownload/xvideos.py
+xdownload/youporn.py
 xdownload.egg-info/PKG-INFO
 xdownload.egg-info/SOURCES.txt
 xdownload.egg-info/dependency_links.txt

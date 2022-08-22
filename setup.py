@@ -1,10 +1,10 @@
 from setuptools import setup
 
 setup(name='xdownload',
-      version='0.0.14',
+      version='0.0.15',
       description='Video downloader/meta tag extractor for various web sites',
       url='https://bitbucket.org/pi11/xdownload',
       packages=['xdownload',],
       author="pi11",
-      author_email="webii@yandex.ru"
+      author_email=""
     )
