@@ -11,11 +11,11 @@ def login():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:103.0) Gecko/20100101 Firefox/103.0",
         "Referer": "https://www.pornhub.com/",
+        'Accept-encoding': 'gzip, deflate'
     }
     ses = requests.Session()
     ses.cookies.clear()
     ses.headers.update(headers)
-    
     return ses
 
 
@@ -33,7 +33,7 @@ def get_video_info(ses, url, tries=3, timeout=5):
             time.sleep(timeout * retries)
 
     # data = ses.get(url).text
-    print(r.request.headers)
+    # print(r.request.headers)
     parsed = pq(data)
     title = parsed("h1.title:first").text()
     categories = [c.text() for c in parsed(".categoriesWrapper a").items()]
