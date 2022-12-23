@@ -77,7 +77,7 @@ def search_videos(
     domain = "https://www.xvideos.com"
     result = []
     for p in pages:
-        url = f"{domain}?k={query}&p={p}&datef=6month"
+        url = f"{domain}?k={query}&p={p}&datef=6month&sort=rating"
         if DEBUG:
             print(f"Loading: {url}")
         new = parse_xvideos_url(ses, url, domain)
