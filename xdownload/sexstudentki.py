@@ -32,7 +32,7 @@ def get_video_info(ses, url, tries=3, timeout=5):
     data = ses.get(url).text
     parsed = pq(data)
     parsed.make_links_absolute(_DOMAIN)
-    title = parsed(".video-header h1:first").text()
+    title = parsed("title").text()
     tags = [c.text() for c in parsed(".tags-alt a").items()]
     desc = ""  # parsed("p.desc").text()
     # embed_url = parsed('meta[property="og:video"]').attr("content")
