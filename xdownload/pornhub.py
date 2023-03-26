@@ -61,7 +61,7 @@ def parse_pornhub_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
             time.sleep(timeout * retries)
 
     parsed = pq(data)
-    items = parsed.items("li.videoBox a:first"):
+    items = parsed.items("li.videoBox a:first")
     if len(items) == 0:
         print("Something wrong, here is data:")
         print(data)
