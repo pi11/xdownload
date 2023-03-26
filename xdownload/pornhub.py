@@ -11,7 +11,7 @@ def login():
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:103.0) Gecko/20100101 Firefox/103.0",
         "Referer": "https://www.pornhub.com/",
-        'Accept-encoding': 'gzip, deflate'
+        "Accept-encoding": "gzip, deflate",
     }
     ses = requests.Session()
     ses.cookies.clear()
@@ -22,7 +22,7 @@ def login():
 def get_video_info(ses, url, tries=3, timeout=5):
     retries = 1
     data = False
-    url +="&utm_source=twitter"
+    url += "&utm_source=twitter"
     while not data and retries <= tries:
         try:
             r = ses.get(url)
@@ -62,16 +62,18 @@ def parse_pornhub_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
 
     parsed = pq(data)
     items = parsed.items("li.videoBox a:first")
-    if len(items) == 0:
-        print("Something wrong, here is data:")
-        print(data)
-        
+    i = 0
     for el in items:
+        i += 1
         url = el.attr("href")
         if "view_video" in url:
             if DEBUG:
                 print("New video url found: %s" % url)
             result.append("%s%s" % (domain, url))
+    if i == 0:  # no result
+        print("Something wrong, here is data:")
+        print(data)
+
     return result
 
 
