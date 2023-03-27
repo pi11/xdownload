@@ -5,6 +5,11 @@ from requests.exceptions import ConnectionError
 from pyquery import PyQuery as pq
 from urllib.parse import quote
 
+try:
+    from webscrapper.client import get_page
+except ModuleNotFoundError:  # no webscrapper used
+    pass
+
 
 def login():
     login_url = ""
@@ -19,21 +24,33 @@ def login():
     return ses
 
 
-def get_video_info(ses, url, tries=3, timeout=5):
-    retries = 1
+def load_ph_page(url, ses, tries, scrapper_key=None):
+    """Loading PH page using webscrapper or internal session"""
+    retries = 0
     data = False
-    url += "&utm_source=twitter"
     while not data and retries <= tries:
-        try:
-            r = ses.get(url)
-            data = r.text
-        except ConnectionError:
-            retries += 1
-            print("Connection error, sleeping for %s seconds" % (timeout * retries))
-            time.sleep(timeout * retries)
+        if scrapper_key:
+            print("Using Scrapper API\n")
+            result = get_page(url, api_key=scrapper_key)
+            
+            if result["error"]:
+                data = False
+            else:
+                data = result["html"]
+        else:
+            try:
+                r = ses.get(url)
+                data = r.text
+            except ConnectionError:
+                retries += 1
+                print("Connection error, sleeping for %s seconds" % (timeout * retries))
+                time.sleep(timeout * retries)
+    return data
 
-    # data = ses.get(url).text
-    # print(r.request.headers)
+
+def get_video_info(ses, url, tries=3, timeout=5, scrapper_key=None):
+    url += "&utm_source=twitter"
+    data = load_ph_page(url, ses, tries, scrapper_key)
     parsed = pq(data)
     title = parsed("h1.title:first").text()
     categories = [c.text() for c in parsed(".categoriesWrapper a").items()]
@@ -48,18 +65,12 @@ def get_video_info(ses, url, tries=3, timeout=5):
     }
 
 
-def parse_pornhub_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
+def parse_pornhub_url(
+    ses, url, domain, DEBUG=False, tries=3, timeout=5, scrapper_key=False
+):
+    """If scrapper key is provided used webscrapper api"""
     result = []
-    retries = 1
-    data = False
-    while not data and retries <= tries:
-        try:
-            data = ses.get(url).text
-        except ConnectionError:
-            retries += 1
-            print("Connection error, sleeping for %s seconds" % (timeout * retries))
-            time.sleep(timeout * retries)
-
+    data = load_ph_page(url, ses, tries, scrapper_key)
     parsed = pq(data)
     items = parsed.items("li.videoBox a:first")
     i = 0
@@ -86,6 +97,7 @@ def search_videos(
     rus=False,
     recent=False,
     DEBUG=False,
+    scrapper_key=None,
 ):
     if recent:
         recent_query = "&o=mr"
@@ -122,6 +134,7 @@ def get_recent_videos(
     ],
     rus=False,
     DEBUG=False,
+    scrapper_key=None,
 ):
     """Function return dict with url, title and url for video download
 
@@ -156,6 +169,7 @@ def get_hot_videos(
     country=False,
     DEBUG=False,
     mv=False,
+    scrapper_key=None,
 ):
     """Function return dict with url, title and url for video download"""
 
