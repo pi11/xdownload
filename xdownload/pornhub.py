@@ -8,6 +8,9 @@ from urllib.parse import quote
 try:
     from webscrapper.client import get_page
 except ModuleNotFoundError:  # no webscrapper used
+    print("Warning not webscrapper module")
+    print("You can install it with:")
+    print("pip install webscrapper")
     pass
 
 
