@@ -123,7 +123,7 @@ def search_videos(
         url = b_url + str(p)
         if DEBUG:
             print("Loading: %s" % url)
-        new = parse_pornhub_url(ses, url, domain)
+        new = parse_pornhub_url(ses, url, domain, scrapper_key=scrapper_key)
         if new:
             result += new
         time.sleep(10)  # some user behavior emulation
@@ -156,7 +156,7 @@ def get_recent_videos(
         url = b_url + str(p)
         if DEBUG:
             print("Loading: %s" % url)
-        new = parse_pornhub_url(ses, url, domain)
+        new = parse_pornhub_url(ses, url, domain, scrapper_key)
         if new:
             result += new
         time.sleep(10)  # some user behavior emulation
@@ -191,7 +191,7 @@ def get_hot_videos(
         url = b_url + str(p)
         if DEBUG:
             print("Loading: %s" % url)
-        new = parse_pornhub_url(ses, url, domain)
+        new = parse_pornhub_url(ses, url, domain, scrapper_key)
         if new:
             result += new
         time.sleep(10)  # some user behavior emulation
