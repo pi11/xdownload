@@ -43,7 +43,7 @@ def load_ph_page(url, ses, tries, scrapper_key=None):
         else:
             try:
                 r = ses.get(
-                    url, cookies={"age_verified": 1, "accessAgeDisclaimerPH": 1}
+                    url, cookies={"age_verified": "1", "accessAgeDisclaimerPH": "1"}
                 )
                 data = r.text
             except ConnectionError:
