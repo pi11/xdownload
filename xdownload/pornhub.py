@@ -35,14 +35,16 @@ def load_ph_page(url, ses, tries, scrapper_key=None):
         if scrapper_key:
             print("Using Scrapper API\n")
             result = get_page(url, api_key=scrapper_key)
-            
+
             if result["error"]:
                 data = False
             else:
                 data = result["html"]
         else:
             try:
-                r = ses.get(url)
+                r = ses.get(
+                    url, cookies={"age_verified": 1, "accessAgeDisclaimerPH": 1}
+                )
                 data = r.text
             except ConnectionError:
                 retries += 1
