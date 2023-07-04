@@ -27,7 +27,7 @@ def login():
     return ses
 
 
-def load_ph_page(url, ses, tries, scrapper_key=None):
+def load_ph_page(url, ses, tries, scrapper_key=None, timeout=5):
     """Loading PH page using webscrapper or internal session"""
     retries = 0
     data = False
