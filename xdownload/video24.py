@@ -8,12 +8,8 @@ from urllib.parse import quote, urljoin
 _DOMAIN = "https://24video.promo"
 # _DOMAIN = "https://ebl.spreee.pro/"
 
-def login(
-    proxies={
-        "http": "http://user124100:kibpow@176.103.82.59:8521",
-        "https": "http://user124100:kibpow@176.103.82.59:8521",
-    }
-):
+
+def login(proxies={}):
     login_url = ""
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/116.0",
@@ -23,7 +19,6 @@ def login(
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
         "Accept-Language": "en-US,en;q=0.5",
         "Accept-Encoding": "gzip, deflate, br",
-        
     }
     ses = requests.Session()
     ses.headers.update(headers)
@@ -51,11 +46,15 @@ def get_video_info(ses, url, tries=3, timeout=5):
     print("Downloading embed url: %s" % embed_url)
     data_embed = ses.get(embed_url).text
     p2 = pq(data_embed)
-    mp4 = p2("video.fp-engine").attr("src")
+    # mp4 = p2("video.fp-engine").attr("src")
+    poster = parsed('meta[property="og:image"]').attr("content")
+
+    mp4_url_re = re.compile(r"video_url: '(.*?)',")
+    mp4 = mp4_url_re.findall(data_embed)[0]
+    print(f"Mp4: {mp4}")
     if not mp4:
         print("No video found!")
         print(data_embed)
-    poster = parsed("video:first").attr("poster")
 
     return {
         "page": url,
@@ -109,8 +108,8 @@ def get_recent_videos(
     domain = _DOMAIN
 
     for p in pages:
-        url = f"{domain}/video/filter?page={p}&sort_by=post_date"
-        
+        url = f"{domain}/video/filter?page={p}&sort_by=rating"
+
         if DEBUG:
             print("Loading: %s" % url)
         new = parse_url(ses, url, domain)
