@@ -5,16 +5,31 @@ from requests.exceptions import ConnectionError
 from pyquery import PyQuery as pq
 from urllib.parse import quote, urljoin
 
-_DOMAIN = "https://24video.promo/"
+_DOMAIN = "https://24video.promo"
+# _DOMAIN = "https://ebl.spreee.pro/"
 
-def login(proxies={}):
+def login(
+    proxies={
+        "http": "http://user124100:kibpow@176.103.82.59:8521",
+        "https": "http://user124100:kibpow@176.103.82.59:8521",
+    }
+):
     login_url = ""
     headers = {
-        'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0',
-        }    
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/116.0",
+        "Referer": "https://www.google.ru/",
+        "DNT": "1",
+        "Connection": "keep-alive",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.5",
+        "Accept-Encoding": "gzip, deflate, br",
+        
+    }
     ses = requests.Session()
-    ses.proxies=proxies
+    ses.headers.update(headers)
+    ses.proxies = proxies
     return ses
+
 
 def get_video_info(ses, url, tries=3, timeout=5):
     retries = 1
@@ -29,21 +44,28 @@ def get_video_info(ses, url, tries=3, timeout=5):
 
     data = ses.get(url).text
     parsed = pq(data)
-    title = parsed('h1.video-title:first').text()
-    tags = [c.text() for c in parsed('p.video-info-tags a').items()]
-    desc = parsed('p.desc').text()
-    embed_url = parsed('meta[property="og:video"]').attr('content')
-    print('Downloading embed url: %s' % embed_url)
+    title = parsed("h1.video-title:first").text()
+    tags = [c.text() for c in parsed("p.video-info-tags a").items()]
+    desc = parsed("p.desc").text()
+    embed_url = parsed('meta[property="og:video"]').attr("content")
+    print("Downloading embed url: %s" % embed_url)
     data_embed = ses.get(embed_url).text
     p2 = pq(data_embed)
-    mp4 = p2('video:first').attr('src')
+    mp4 = p2("video.fp-engine").attr("src")
     if not mp4:
-        print('No video found!')
+        print("No video found!")
         print(data_embed)
-    poster = parsed('video:first').attr('poster')
-    
-    return {"page":url, "title":title, "tags":tags, "description":desc, "mp4":mp4,
-            "poster":poster}
+    poster = parsed("video:first").attr("poster")
+
+    return {
+        "page": url,
+        "title": title,
+        "tags": tags,
+        "description": desc,
+        "mp4": mp4,
+        "poster": poster,
+    }
+
 
 def parse_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
     result = []
@@ -56,50 +78,59 @@ def parse_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
             retries += 1
             print("Connection error, sleeping for %s seconds" % (timeout * retries))
             time.sleep(timeout * retries)
-        
+
     parsed = pq(data)
-    for el in parsed.items('.list a.list-item'):
-        url = el.attr('href')
+    for el in parsed.items("a.list-item"):
+        url = el.attr("href")
         print(url)
         if "video/view" in url:
             if DEBUG:
-                print('New video url found: %s' % url)
+                print("New video url found: %s" % url)
             r_url = urljoin(domain, url)
             result.append(r_url)
+    # print(data)
     return result
 
-    
-def get_recent_videos(ses, pages=[1, ], rus=False, DEBUG=False):
-    """ Function return dict with url, title and url for video download
+
+def get_recent_videos(
+    ses,
+    pages=[
+        1,
+    ],
+    rus=False,
+    DEBUG=False,
+):
+    """Function return dict with url, title and url for video download
 
     Input: requests session,
     list of pages to parse"""
-    
+
     result = []
-    domain = _DOMAIN 
-    b_url = "%s/video/filter?sort=3&time=0&page=" % domain
-                      
+    domain = _DOMAIN
+
     for p in pages:
-        url = b_url + str(p)
+        url = f"{domain}/video/filter?page={p}&sort_by=post_date"
+        
         if DEBUG:
-            print('Loading: %s' % url)
+            print("Loading: %s" % url)
         new = parse_url(ses, url, domain)
         if new:
             result += new
-        time.sleep(10) # some user behavior emulation
+        time.sleep(10)  # some user behavior emulation
     return result
+
 
 if __name__ == "__main__":
     ses = login()
-    #v = get_video_info(ses, 'https://www.24video.vip/video/view/2706767')
-    #print(v)
+    # v = get_video_info(ses, 'https://www.24video.vip/video/view/2706767')
+    # print(v)
     # example usage:
-    #for v in search_videos(ses, 'blowjob and anal', DEBUG=True)[:5]:
+    # for v in search_videos(ses, 'blowjob and anal', DEBUG=True)[:5]:
     #    print("Video:", v)
     #    print (get_video_info(ses, v))
     #    time.sleep(5)
 
     for v in get_recent_videos(ses, DEBUG=True)[:5]:
         print("Video:", v)
-        print (get_video_info(ses, v))
+        print(get_video_info(ses, v))
         time.sleep(5)
