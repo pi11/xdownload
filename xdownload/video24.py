@@ -37,7 +37,7 @@ def get_video_info(ses, url, tries=3, timeout=5):
             print("Connection error, sleeping for %s seconds" % (timeout * retries))
             time.sleep(timeout * retries)
 
-    data = ses.get(url).text
+    # data = ses.get(url).text
     parsed = pq(data)
     title = parsed("h1.video-title:first").text()
     tags = [c.text() for c in parsed("p.video-info-tags a").items()]
