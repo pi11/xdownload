@@ -5,7 +5,7 @@ from requests.exceptions import ConnectionError
 from pyquery import PyQuery as pq
 from urllib.parse import quote, urljoin
 
-_DOMAIN = "https://sex-studentki.tv"
+_DOMAIN = "https://ru.sex-studentki.guru/"
 
 
 def login(proxies={}):
