@@ -39,12 +39,24 @@ def get_video_info(ses, url, tries=3, timeout=5):
 
     # data = ses.get(url).text
     parsed = pq(data)
+    embed_url = parsed('meta[property="og:video"]').attr("content")
+    if not embed_url:
+        print("Embed url is none, skiping")
+        time.sleep(3)
+        return False
     title = parsed("h1.video-title:first").text()
     tags = [c.text() for c in parsed("p.video-info-tags a").items()]
     desc = parsed("p.desc").text()
-    embed_url = parsed('meta[property="og:video"]').attr("content")
     print("Downloading embed url: %s" % embed_url)
-    data_embed = ses.get(embed_url).text
+    data_embed = False
+    retries = 0
+    while not data_embed and retries < tries:
+        try:
+            data_embed = ses.get(embed_url).text
+        except ConnectionError:
+            retries += 1
+            time.sleep(timeout * retries)
+            
     p2 = pq(data_embed)
     # mp4 = p2("video.fp-engine").attr("src")
     poster = parsed('meta[property="og:image"]').attr("content")
