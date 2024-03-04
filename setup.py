@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='xdownload',
-      version='0.0.23',
+      version='0.0.24',
       description='Video downloader/meta tag extractor for various web sites',
       url='https://bitbucket.org/pi11/xdownload',
       packages=['xdownload',],

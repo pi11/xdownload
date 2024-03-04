@@ -45,6 +45,7 @@ def get_video_info(ses, url, tries=3, timeout=5):
 
     poster = parsed('meta[property="og:image"]').attr("content")
 
+    mp4 = False
     for dl in parsed("a").items():
         if "/down/hd/" in dl.attr("href"):
             url = dl.attr("href")
