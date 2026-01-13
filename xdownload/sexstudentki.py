@@ -1,35 +1,46 @@
 import re
 import time
 import requests
+import traceback
 from requests.exceptions import ConnectionError
 from pyquery import PyQuery as pq
 from urllib.parse import quote, urljoin
 
-_DOMAIN = "https://ru.sex-studentki.guru/"
+_DOMAIN = "https://sex-studentki.live"
 
 
-def login(proxies={}):
-    login_url = ""
-    headers = {
-        "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0",
-    }
+def login(proxies=None):
+    # print(proxies)
+    # login_url = ""
     ses = requests.Session()
-    ses.proxies = proxies
+    ses.verify = False
+    if proxies:
+        print(f"Proxies: {proxies}")
+        ses.proxies = proxies
+
+    ses.headers.update(
+        {
+            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0",
+        }
+    )
     return ses
 
 
-def get_video_info(ses, url, tries=3, timeout=5):
-    retries = 1
-    data = False
-    while not data and retries <= tries:
-        try:
-            data = ses.get(url).text
-        except ConnectionError:
-            retries += 1
-            print("Connection error, sleeping for %s seconds" % (timeout * retries))
-            time.sleep(timeout * retries)
+def get_video_info(ses, url, tries=3, timeout=15):
 
-    data = ses.get(url).text
+    for attempt in range(1, tries + 1):
+        try:
+            r = ses.get(url, timeout=timeout)
+            r.raise_for_status()
+            data = r.text
+            break
+        except RequestException:
+            print(f"Request failed, sleeping {timeout * attempt}s")
+            print(traceback.format_exc())
+            time.sleep(timeout * attempt)
+    else:
+        raise RuntimeError("All retries failed")
+
     parsed = pq(data)
     parsed.make_links_absolute(_DOMAIN)
     title = parsed("title").text()
@@ -53,13 +64,13 @@ def get_video_info(ses, url, tries=3, timeout=5):
     }
 
 
-def parse_url(ses, url, domain, DEBUG=False, tries=3, timeout=5):
+def parse_url(ses, url, domain, DEBUG=False, tries=3, timeout=15):
     result = []
     retries = 1
     data = False
     while not data and retries <= tries:
         try:
-            data = ses.get(url).text
+            data = ses.get(url, timeout=timeout).text
         except ConnectionError:
             retries += 1
             print("Connection error, sleeping for %s seconds" % (timeout * retries))
@@ -93,9 +104,11 @@ def get_recent_videos(
     result = []
     domain = _DOMAIN
     b_url = "%s/videos?page=" % domain
-
     for p in pages:
         url = b_url + str(p)
+        if p == 0:
+            url = _DOMAIN
+
         if DEBUG:
             print("Loading: %s" % url)
         new = parse_url(ses, url, domain)
@@ -106,7 +119,16 @@ def get_recent_videos(
 
 
 if __name__ == "__main__":
-    ses = login()
+    ses = login(
+        proxies={
+            "http": "http://Y9whdp:XXKUf1@185.111.25.123:8000",
+            "https": "http://Y9whdp:XXKUf1@185.111.25.123:8000",
+        }
+        # proxies={
+        # "https": "http://btDGFW:13UrM1@95.181.163.220:9267",
+        # "http": "http://btDGFW:13UrM1@95.181.163.220:9267",
+        # }
+    )
     # v = get_video_info(ses, 'https://www.24video.vip/video/view/2706767')
     # print(v)
     # example usage:
