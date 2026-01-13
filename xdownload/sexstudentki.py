@@ -119,24 +119,7 @@ def get_recent_videos(
 
 
 if __name__ == "__main__":
-    ses = login(
-        proxies={
-            "http": "http://Y9whdp:XXKUf1@185.111.25.123:8000",
-            "https": "http://Y9whdp:XXKUf1@185.111.25.123:8000",
-        }
-        # proxies={
-        # "https": "http://btDGFW:13UrM1@95.181.163.220:9267",
-        # "http": "http://btDGFW:13UrM1@95.181.163.220:9267",
-        # }
-    )
-    # v = get_video_info(ses, 'https://www.24video.vip/video/view/2706767')
-    # print(v)
-    # example usage:
-    # for v in search_videos(ses, 'blowjob and anal', DEBUG=True)[:5]:
-    #    print("Video:", v)
-    #    print (get_video_info(ses, v))
-    #    time.sleep(5)
-
+    ses = login(proxies={})
     for v in get_recent_videos(ses, DEBUG=True)[:5]:
         print("Video:", v)
         print(get_video_info(ses, v))
