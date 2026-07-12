@@ -2,11 +2,11 @@ import re
 import time
 import requests
 import traceback
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, RequestException
 from pyquery import PyQuery as pq
 from urllib.parse import quote, urljoin
 
-_DOMAIN = "https://sex-studentki.live"
+_DOMAIN = "https://ru.sex-studentki.top"
 
 
 def login(proxies=None):
@@ -21,7 +21,7 @@ def login(proxies=None):
     ses.headers.update(
         {
             "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:52.0) Gecko/20100101 Firefox/52.0",
-            "Referer": _DOMAIN
+            "Referer": _DOMAIN,
         }
     )
     return ses
@@ -120,8 +120,8 @@ def get_recent_videos(
 
 
 if __name__ == "__main__":
-    ses = login(proxies={})
+    ses = login(proxies={"https": "socks5://127.0.0.1:10808"})
     for v in get_recent_videos(ses, DEBUG=True)[:5]:
         print("Video:", v)
         print(get_video_info(ses, v))
-        time.sleep(5)
+        time.sleep(15)

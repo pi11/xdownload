@@ -101,52 +101,14 @@ def get_recent_videos(
     list of pages to parse"""
 
     result = []
-    if rus:
-        domain = "https://rt.pornhub.com"
-        b_url = "https://rt.pornhub.com/video?p=homemade&o=mv&t=a&cc=ru&hd=1&page="
-    else:
-        domain = "https://www.pornhub.com"
-        b_url = "https://www.pornhub.com/video?p=homemade&o=mv&cc=ru&page="
+    domain = "https://www.xvideos.com"
+    b_url = "https://www.xvideos.com/best/?p="
 
     for p in pages:
         url = b_url + str(p)
         if DEBUG:
             print("Loading: %s" % url)
-        new = parse_pornhub_url(ses, url, domain)
-        if new:
-            result += new
-        time.sleep(10)  # some user behavior emulation
-    return result
-
-
-def get_hot_videos(
-    ses,
-    pages=[
-        2,
-    ],
-    hm=True,
-    country=False,
-    DEBUG=False,
-    mv=False,
-):
-    """Function return dict with url, title and url for video download"""
-
-    result = []
-    domain = "https://www.pornhub.com"
-    if mv:
-        b_url = "%s/video?o=mv" % domain  # top videos
-    else:
-        b_url = "%s/video?o=ht" % domain  # top videos
-    if hm:
-        b_url = "%s&p=homemade" % b_url
-    if country:
-        b_url = "%s&cc=%s" % (b_url, country)
-    b_url = "%s&page=" % b_url
-    for p in pages:
-        url = b_url + str(p)
-        if DEBUG:
-            print("Loading: %s" % url)
-        new = parse_pornhub_url(ses, url, domain)
+        new = parse_xvideos_url(ses, url, domain)
         if new:
             result += new
         time.sleep(10)  # some user behavior emulation
